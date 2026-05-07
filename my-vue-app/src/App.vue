@@ -1,148 +1,113 @@
 <template>
-  <div :class="['app', { dark: isDark }]">
-    <div class="card">
-      <button class="toggle" @click="toggleTheme">
-        {{ isDark ? '☀️' : '🌙' }}
-      </button>
+  <v-app>
+    <v-main>
+      <v-container class="fill-height d-flex align-center">
+        <v-row class="w-100" justify="center">
+          <v-col cols="12" sm="8" md="6" lg="4">
+            <v-card class="pa-8 text-center" elevation="2">
+              <!-- Theme Toggle Button -->
+              <div class="d-flex justify-end mb-4">
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
+                  @click="toggleTheme"
+                >
+                  <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-moon-waning-crescent' }}</v-icon>
+                </v-btn>
+              </div>
 
-      <img
-        class="avatar"
-        src="https://via.placeholder.com/120"
-        alt="Profile"
-      />
+              <!-- Profile Avatar -->
+              <v-avatar
+                size="120"
+                class="mb-8"
+                color="primary"
+              >
+                <span class="text-h3 font-weight-bold">A</span>
+              </v-avatar>
 
-      <h1>Alaa</h1>
-      <p class="tagline">Designer crafting thoughtful experiences</p>
+              <!-- Name -->
+              <h1 class="text-h4 mb-2 font-weight-600">Alaa</h1>
 
-      <div class="links">
-        <a href="#" target="_blank">Portfolio</a>
-        <a href="#" target="_blank">Dribbble</a>
-        <a href="#" target="_blank">LinkedIn</a>
-        <a href="mailto:you@email.com">Email</a>
-      </div>
-    </div>
-  </div>
+              <!-- Tagline -->
+              <p class="text-body2 opacity-70 mb-8">
+                Designer crafting thoughtful experiences
+              </p>
+
+              <!-- Link Buttons -->
+              <div class="d-flex flex-column gap-5">
+                <LinkButton
+                  v-for="link in links"
+                  :key="link.label"
+                  :label="link.label"
+                  :url="link.url"
+                  :icon="link.icon"
+                />
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useTheme } from 'vuetify'
+import LinkButton from './components/LinkButton.vue'
 
+const vuetifyTheme = useTheme()
 const isDark = ref(true)
 
-onMounted(() => {
-  const saved = localStorage.getItem('theme')
-  if (saved) isDark.value = saved === 'dark'
-})
+// Link buttons data
+const links = [
+  { label: 'Portfolio', url: '#', icon: 'mdi-briefcase' },
+  { label: 'Dribbble', url: '#', icon: 'mdi-palette' },
+  { label: 'LinkedIn', url: '#', icon: 'mdi-linkedin' },
+  { label: 'Email', url: 'mailto:you@email.com', icon: 'mdi-email' }
+]
 
-function toggleTheme() {
+// Initialize theme from localStorage or system preference
+const initTheme = () => {
+  const saved = localStorage.getItem('theme')
+  if (saved) {
+    isDark.value = saved === 'dark'
+  } else {
+    isDark.value = true
+  }
+  applyTheme()
+}
+
+// Apply theme to Vuetify
+const applyTheme = () => {
+  vuetifyTheme.global.name.value = isDark.value ? 'dark' : 'light'
+}
+
+// Toggle theme
+const toggleTheme = () => {
   isDark.value = !isDark.value
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  applyTheme()
 }
+
+// Watch for theme changes
+watch(isDark, () => {
+  applyTheme()
+})
+
+// Initialize on mount
+initTheme()
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-}
-
-body {
+:root {
   font-family: 'Inter', sans-serif;
 }
 
-/* Layout */
-.app {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  transition: background 0.3s ease;
-}
-
-.app.dark {
-  background: #0f0f0f;
-}
-
-/* Card */
-.card {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  padding: 32px 24px;
-  border-radius: 16px;
-  background: white;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.app.dark .card {
-  background: #1a1a1a;
-  color: white;
-}
-
-/* Avatar */
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 16px;
-}
-
-/* Text */
-h1 {
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.tagline {
-  font-size: 14px;
-  opacity: 0.7;
-  margin-bottom: 24px;
-}
-
-/* Links */
-.links {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.links a {
-  text-decoration: none;
-  padding: 12px;
-  border-radius: 10px;
-  background: #eeeeee;
-  color: black;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.links a:hover {
-  transform: translateY(-2px);
-  background: #ddd;
-}
-
-.app.dark .links a {
-  background: #2a2a2a;
-  color: white;
-}
-
-.app.dark .links a:hover {
-  background: #3a3a3a;
-}
-
-/* Toggle */
-.toggle {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  border: none;
-  background: transparent;
-  font-size: 18px;
-  cursor: pointer;
+html, body {
+  font-family: 'Inter', sans-serif;
 }
 </style>

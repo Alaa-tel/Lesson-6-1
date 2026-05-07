@@ -1,7 +1,6 @@
 <template>
-  <div class="home">
-    <h1>Welcome to Your Vue.js App</h1>
-    <p>This is the home page of your application.</p>
+  <div>
+    <!-- Links page content rendered in App.vue -->
   </div>
 </template>
 
@@ -14,8 +13,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.home {
-  text-align: center;
-  margin-top: 50px;
-}
 </style>
